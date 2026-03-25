@@ -6,205 +6,117 @@
     <title>UF Pro - Fco Gamboa</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ef4444">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #fee2e2; }
-        .app-card { max-width: 450px; margin: 1.5rem auto; border-radius: 2.5rem; }
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        
-        /* Estilo para la notificación de copiado */
-        .copy-toast { 
-            visibility: hidden; 
-            min-width: 250px; 
-            background-color: #1f2937; 
-            color: #ffffff; 
-            text-align: center; 
-            border-radius: 50px; 
-            padding: 12px; 
-            position: fixed; 
-            z-index: 50; 
-            left: 50%; 
-            bottom: 40px; 
-            transform: translateX(-50%); 
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #fee2e2; }
+        .app-card { max-width: 450px; margin: 1.5rem auto; border-radius: 2.5rem; border: 1px solid #fecaca; }
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .copy-toast { visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; z-index: 100; left: 50%; bottom: 40px; transform: translateX(-50%); }
         .copy-toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 40px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 40px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body class="p-4">
-    <div class="app-card bg-white shadow-2xl overflow-hidden border border-red-100">
+    <div class="app-card bg-white shadow-2xl overflow-hidden">
         <div class="bg-red-500 p-8 text-white text-center">
             <h1 class="text-2xl font-black uppercase tracking-tighter">Calculadora UF</h1>
-            <p id="rateInfo" class="text-red-100 text-sm mt-2 font-medium italic italic">Conectando con indicadores...</p>
-            <div id="sourceBadge" class="inline-block mt-2 px-3 py-1 bg-red-600 rounded-full text-[10px] font-bold uppercase tracking-widest opacity-0 transition-opacity duration-500">
+            <p id="rateInfo" class="text-red-100 text-sm mt-2 font-medium italic">Sincronizando con Banco Central...</p>
+            <div id="sourceBadge" class="inline-block mt-2 px-3 py-1 bg-red-700 rounded-full text-[10px] font-bold uppercase tracking-widest opacity-0 transition-opacity">
                 Fuente: <span id="sourceName">-</span>
             </div>
         </div>
 
         <div class="p-6">
-            <button onclick="cambiarModo()" class="w-full flex items-center justify-center gap-3 py-4 mb-6 bg-red-50 text-red-600 rounded-2xl font-black border border-red-100 hover:bg-red-100 transition active:scale-95 shadow-sm">
+            <button onclick="cambiarModo()" class="w-full flex items-center justify-center gap-3 py-4 mb-6 bg-red-50 text-red-600 rounded-2xl font-black border border-red-100 active:scale-95 transition shadow-sm">
                 <span id="modeText">Modo: Pesos a UF</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
             </button>
 
             <div class="mb-6 text-center">
-                <label class="block text-xs font-black text-red-400 uppercase mb-2 tracking-widest">Monto a Calcular</label>
-                <input type="number" id="amount" 
-                       class="w-full p-5 bg-gray-50 border-2 border-red-50 rounded-3xl text-3xl font-black focus:border-red-400 focus:outline-none transition text-center text-gray-700 shadow-inner" 
-                       placeholder="0" oninput="convertir()">
+                <label class="block text-[10px] font-black text-red-400 uppercase mb-2 tracking-widest italic">Monto a Calcular</label>
+                <input type="number" id="amount" class="w-full p-5 bg-gray-50 border-2 border-red-50 rounded-3xl text-3xl font-black focus:border-red-400 focus:outline-none transition text-center text-gray-700 shadow-inner" placeholder="0" oninput="convertir()">
             </div>
 
             <div class="grid grid-cols-4 gap-3">
-                <button onclick="convertir()" class="col-span-3 py-5 bg-red-600 text-white rounded-3xl font-black text-xl shadow-xl shadow-red-200 hover:bg-red-700 active:scale-95 transition-all uppercase tracking-wide">
-                    Calcular
-                </button>
-                <button onclick="limpiar()" class="col-span-1 py-5 bg-gray-100 text-gray-400 rounded-3xl flex items-center justify-center hover:bg-gray-200 active:scale-95 transition-all shadow-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                <button onclick="convertir()" class="col-span-3 py-5 bg-red-600 text-white rounded-3xl font-black text-xl shadow-lg hover:bg-red-700 active:scale-95 transition-all">CALCULAR</button>
+                <button onclick="limpiar()" class="col-span-1 py-5 bg-gray-100 text-gray-400 rounded-3xl flex items-center justify-center active:scale-95 transition-all shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
             </div>
 
             <div class="mt-8 p-8 bg-red-50 rounded-[2.5rem] border-2 border-dashed border-red-200 text-center">
-                <p class="text-[10px] font-black text-red-400 uppercase mb-2 tracking-widest">Resultado de Conversión</p>
-                <p id="result" class="text-4xl font-black text-red-600 mb-6 drop-shadow-sm">$ 0</p>
-                
-                <button onclick="copiarResultado()" class="mx-auto flex items-center gap-2 px-6 py-3 bg-white text-red-600 rounded-full text-xs font-black shadow-lg border border-red-100 hover:bg-red-600 hover:text-white transition-all active:scale-90 uppercase tracking-tighter">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
+                <p id="result" class="text-4xl font-black text-red-600 mb-6">$ 0</p>
+                <button onclick="copiarResultado()" class="mx-auto flex items-center gap-2 px-6 py-3 bg-white text-red-600 rounded-full text-[10px] font-black shadow-md border border-red-100 hover:bg-red-600 hover:text-white transition-all active:scale-90 uppercase tracking-tighter">
                     Copiar Resultado
                 </button>
             </div>
         </div>
         
         <div class="p-8 bg-gray-50 text-center border-t border-red-50">
-            <p class="text-[10px] font-bold text-gray-400 italic mb-1">Software de Finanzas</p>
             <p class="text-2xl font-black text-red-500 tracking-tighter uppercase leading-none">Fco Gamboa</p>
+            <p class="text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-widest">Fintech Expert System</p>
         </div>
     </div>
 
-    <div id="toast" class="copy-toast font-bold italic">¡Copiado con éxito! 📋</div>
+    <div id="toast" class="copy-toast font-bold italic">¡Copiado al portapapeles! 📋</div>
 
     <script>
         let isPesoToUF = true;
         let valorUF = 0;
 
-        // Registro de SW para funcionalidad PWA
-        if ('serviceWorker' in navigator) { 
-            navigator.serviceWorker.register('sw.js').catch(err => console.log("SW Error", err)); 
-        }
-
-        /**
-         * LÓGICA DE CASCADA DE FUENTES (FALLBACK)
-         * Intenta con 3 fuentes distintas para asegurar funcionamiento en Chile.
-         */
         async function getTasa() {
+            // Usamos un PROXY para saltar el bloqueo de seguridad (CORS) del móvil
+            const proxy = "https://api.allorigins.win/get?url=";
             const fuentes = [
                 { 
-                    id: "F1",
-                    nombre: "Indicadores Ley", 
-                    url: "https://api.leyde.cl/indicadores/v1/uf/json", 
-                    parse: (d) => d.valor 
+                    nombre: "Mindicador", 
+                    url: encodeURIComponent("https://mindicador.cl/api/uf"), 
+                    parse: (d) => JSON.parse(d.contents).serie[0].valor 
                 },
                 { 
-                    id: "F2",
-                    nombre: "Mindicador API", 
-                    url: "https://mindicador.cl/api/uf", 
-                    parse: (d) => d.serie[0].valor 
-                },
-                { 
-                    id: "F3",
-                    nombre: "Gael Global", 
-                    url: "https://api.gael.cl/general/public/indicadores/uf", 
-                    parse: (d) => parseFloat(d.valor.replace('.', '').replace(',', '.')) 
+                    nombre: "Gael", 
+                    url: encodeURIComponent("https://api.gael.cl/general/public/indicadores/uf"), 
+                    parse: (d) => parseFloat(JSON.parse(d.contents).valor.replace('.', '').replace(',', '.')) 
                 }
             ];
 
             for (const fuente of fuentes) {
                 try {
-                    // Timeout de 6 segundos por fuente
-                    const controller = new AbortController();
-                    const timeout = setTimeout(() => controller.abort(), 6000);
-
-                    const res = await fetch(fuente.url, { signal: controller.signal });
-                    clearTimeout(timeout);
-
-                    if (!res.ok) throw new Error("Status Error");
-                    
+                    const res = await fetch(proxy + fuente.url);
+                    if (!res.ok) throw new Error();
                     const data = await res.json();
-                    const extractedValue = fuente.parse(data);
+                    const extracted = fuente.parse(data);
                     
-                    if (extractedValue > 0) {
-                        valorUF = extractedValue;
+                    if (extracted > 0) {
+                        valorUF = extracted;
                         document.getElementById('rateInfo').innerText = `Valor UF: $${valorUF.toLocaleString('es-CL')} CLP`;
                         document.getElementById('sourceName').innerText = fuente.nombre;
                         document.getElementById('sourceBadge').style.opacity = "1";
-                        return; // Éxito: Detener búsqueda
+                        return;
                     }
-                } catch (e) {
-                    console.warn(`Fuente ${fuente.nombre} falló.`);
-                }
+                } catch (e) { console.warn(`Fallo ${fuente.nombre}`); }
             }
-            document.getElementById('rateInfo').innerText = "Error: Reintente conexión";
+            document.getElementById('rateInfo').innerText = "Sin conexión (Reintenta)";
         }
 
-        function cambiarModo() {
-            isPesoToUF = !isPesoToUF;
-            document.getElementById('modeText').innerText = isPesoToUF ? "Modo: Pesos a UF" : "Modo: UF a Pesos";
-            limpiar();
-        }
-
-        function limpiar() {
-            document.getElementById('amount').value = "";
-            document.getElementById('result').innerText = "$ 0";
-            document.getElementById('amount').focus();
-        }
-
+        function cambiarModo() { isPesoToUF = !isPesoToUF; document.getElementById('modeText').innerText = isPesoToUF ? "Modo: Pesos a UF" : "Modo: UF a Pesos"; limpiar(); }
+        function limpiar() { document.getElementById('amount').value = ""; document.getElementById('result').innerText = "$ 0"; }
         function convertir() {
             const val = parseFloat(document.getElementById('amount').value);
             if (isNaN(val) || valorUF === 0) return;
-            
             const res = isPesoToUF ? (val / valorUF) : (val * valorUF);
-            
-            if (isPesoToUF) {
-                // Formato UF con hasta 4 decimales
-                document.getElementById('result').innerText = res.toLocaleString('es-CL', {
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 4
-                }) + " UF";
-            } else {
-                // Formato Peso Chileno
-                document.getElementById('result').innerText = res.toLocaleString('es-CL', {
-                    style: 'currency', 
-                    currency: 'CLP', 
-                    minimumFractionDigits: 0
-                });
-            }
+            document.getElementById('result').innerText = isPesoToUF ? res.toLocaleString('es-CL', {minimumFractionDigits: 2, maximumFractionDigits: 4}) + " UF" : res.toLocaleString('es-CL', {style: 'currency', currency: 'CLP', minimumFractionDigits: 0});
         }
-
         function copiarResultado() {
             const texto = document.getElementById('result').innerText;
-            if (texto === "$ 0" || texto === "0 UF") return;
-
+            if (texto === "$ 0") return;
             navigator.clipboard.writeText(texto).then(() => {
                 const toast = document.getElementById("toast");
                 toast.className = "copy-toast show font-bold italic";
-                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-            }).catch(err => {
-                alert("Error al copiar: Use el navegador Chrome o instale la app.");
+                setTimeout(() => { toast.className = "copy-toast font-bold italic"; }, 3000);
             });
         }
-        
-        // Carga inicial
         getTasa();
     </script>
 </body>
