@@ -1,10 +1,11 @@
 {
   "name": "UF Pro Fco Gamboa",
-  "short_name": "UF-Pro",
+  "short_name": "UF-Gamboa",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#fee2e2",
   "theme_color": "#ef4444",
+  "description": "Calculadora de UF con triple fuente de respaldo",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/1611/1611154.png",
